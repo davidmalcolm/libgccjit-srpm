@@ -60,8 +60,6 @@ Group: Development/Languages
 #     "http://gcc.gnu.org/git/?p=gcc.git;a=snapshot;h=%{GITREV};sf=tgz" \
 #     -O gcc-%{GITREV}.tar.gz
 Source0: gcc-%{GITREV}.tar.gz
-%global fastjar_ver 0.97
-Source4: http://download.savannah.nongnu.org/releases/fastjar/fastjar-%{fastjar_ver}.tar.gz
 URL: http://gcc.gnu.org
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # Need binutils with -pie support >= 2.14.90.0.4-4
@@ -150,12 +148,6 @@ Patch10: gcc48-pr38757.patch
 Patch11: gcc48-libstdc++-docs.patch
 Patch12: gcc48-no-add-needed.patch
 Patch14: gcc48-pr56493.patch
-
-Patch1000: fastjar-0.97-segfault.patch
-Patch1001: fastjar-0.97-len1.patch
-Patch1002: fastjar-0.97-filename0.patch
-Patch1003: fastjar-CVE-2010-0831.patch
-Patch1004: fastjar-man.patch
 
 # On ARM EABI systems, we do want -gnueabi to be part of the
 # target triple.
@@ -250,18 +242,6 @@ chmod 755 split-debuginfo.sh
 
 # This testcase doesn't compile.
 rm libjava/testsuite/libjava.lang/PR35020*
-
-tar xzf %{SOURCE4}
-
-%patch1000 -p0 -b .fastjar-0.97-segfault~
-%patch1001 -p0 -b .fastjar-0.97-len1~
-%patch1002 -p0 -b .fastjar-0.97-filename0~
-%patch1003 -p0 -b .fastjar-CVE-2010-0831~
-%patch1004 -p0 -b .fastjar-man~
-
-%if %{bootstrap_java}
-tar xjf %{SOURCE10}
-%endif
 
 sed -i -e 's/4\.8\.2/4.8.1/' gcc/BASE-VER
 echo 'Red Hat %{version}-%{gcc_release}' > gcc/DEV-PHASE
@@ -443,7 +423,7 @@ for i in ../gcc/doc/*.texi; do mv -f $i.orig $i; done
 # Copy various doc files here and there
 cd ..
 mkdir -p rpm.doc/gfortran rpm.doc/objc
-mkdir -p rpm.doc/boehm-gc rpm.doc/fastjar rpm.doc/libffi rpm.doc/libjava
+mkdir -p rpm.doc/boehm-gc rpm.doc/libffi rpm.doc/libjava
 mkdir -p rpm.doc/go rpm.doc/libgo rpm.doc/libquadmath rpm.doc/libitm
 mkdir -p rpm.doc/changelogs/{gcc/cp,gcc/java,gcc/ada,libstdc++-v3,libobjc,libmudflap,libgomp,libatomic,libsanitizer}
 
@@ -462,9 +442,6 @@ done)
 done)
 (cd boehm-gc; for i in ChangeLog*; do
 	cp -p $i ../rpm.doc/boehm-gc/$i.gc
-done)
-(cd fastjar-%{fastjar_ver}; for i in ChangeLog* README*; do
-	cp -p $i ../rpm.doc/fastjar/$i.fastjar
 done)
 (cd libffi; for i in ChangeLog* README* LICENSE; do
 	cp -p $i ../rpm.doc/libffi/$i.libffi
