@@ -60,8 +60,6 @@ Group: Development/Languages
 #     "http://gcc.gnu.org/git/?p=gcc.git;a=snapshot;h=%{GITREV};sf=tgz" \
 #     -O gcc-%{GITREV}.tar.gz
 Source0: gcc-%{GITREV}.tar.gz
-%global isl_version 0.11.1
-Source1: ftp://gcc.gnu.org/pub/gcc/infrastructure/isl-%{isl_version}.tar.bz2
 %global fastjar_ver 0.97
 Source4: http://download.savannah.nongnu.org/releases/fastjar/fastjar-%{fastjar_ver}.tar.gz
 URL: http://gcc.gnu.org
@@ -159,8 +157,6 @@ Patch1002: fastjar-0.97-filename0.patch
 Patch1003: fastjar-CVE-2010-0831.patch
 Patch1004: fastjar-man.patch
 
-Patch1100: isl-%{isl_version}-aarch64-config.patch
-
 # On ARM EABI systems, we do want -gnueabi to be part of the
 # target triple.
 %ifnarch %{arm}
@@ -189,7 +185,7 @@ Requires: libgccjit = %{version}-%{release}
 This package contains header files for building against libgccjit.
 
 %prep
-%setup -q -n gcc-%{TRUNCATED_GITREV} -a 1
+%setup -q -n gcc-%{TRUNCATED_GITREV}
 %patch0 -p0 -b .hack~
 %patch1 -p0 -b .java-nomulti~
 %patch2 -p0 -b .ppc32-retaddr~
@@ -266,8 +262,6 @@ tar xzf %{SOURCE4}
 %if %{bootstrap_java}
 tar xjf %{SOURCE10}
 %endif
-
-%patch1100 -p0 -b .isl-aarch64~
 
 sed -i -e 's/4\.8\.2/4.8.1/' gcc/BASE-VER
 echo 'Red Hat %{version}-%{gcc_release}' > gcc/DEV-PHASE
