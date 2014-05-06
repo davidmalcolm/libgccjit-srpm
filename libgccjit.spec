@@ -46,13 +46,11 @@
 %ifarch x86_64
 %global multilib_32_arch i686
 %endif
-Summary: Various compilers (C, C++, Objective-C, Java, ...)
+Summary: Shared library for embedding compilation into programs
 Name: libgccjit
-Version: %{gcc_version}
-Release: %{gcc_release}%{?dist}
-# libgcc, libgfortran, libmudflap, libgomp, libstdc++ and crtstuff have
-# GCC Runtime Exception.
-License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ with exceptions and LGPLv2+ and BSD
+Version: 0.1
+Release: 1%{?dist}
+License: GPLv3+
 Group: Development/Languages
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
@@ -60,7 +58,7 @@ Group: Development/Languages
 #     "http://gcc.gnu.org/git/?p=gcc.git;a=snapshot;h=%{GITREV};sf=tgz" \
 #     -O gcc-%{GITREV}.tar.gz
 Source0: gcc-%{GITREV}.tar.gz
-URL: http://gcc.gnu.org
+URL: http://gcc.gnu.org/wiki/JIT
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # Need binutils with -pie support >= 2.14.90.0.4-4
 # Need binutils which can omit dot symbols and overlap .opd on ppc64 >= 2.15.91.0.2-4
@@ -516,5 +514,5 @@ rm -rf %{buildroot}
 %{_includedir}/libgccjit.h
 
 %changelog
-* Tue May  6 2014 David Malcolm <dmalcolm@redhat.com> - %{gcc_version}-%{gcc_release}%{?dist}
-- Initial version, based loosely on gcc-4.8.1-10
+* Tue May  6 2014 David Malcolm <dmalcolm@redhat.com> - 0.1-1
+- Initial packaging, based loosely on gcc-4.8.1-10.src.rpm
