@@ -27,7 +27,6 @@
 %else
 %global build_libitm 0
 %endif
-%global build_cloog 1
 %global build_libstdcxx_docs 1
 # If you don't have already a usable gcc-java and libgcj for your arch,
 # do on some arch which has it rpmbuild -bc --with java_tar gcc.spec
@@ -63,8 +62,6 @@ Group: Development/Languages
 Source0: gcc-%{GITREV}.tar.gz
 %global isl_version 0.11.1
 Source1: ftp://gcc.gnu.org/pub/gcc/infrastructure/isl-%{isl_version}.tar.bz2
-%global cloog_version 0.18.0
-Source2: ftp://gcc.gnu.org/pub/gcc/infrastructure/cloog-%{cloog_version}.tar.gz
 %global fastjar_ver 0.97
 Source4: http://download.savannah.nongnu.org/releases/fastjar/fastjar-%{fastjar_ver}.tar.gz
 URL: http://gcc.gnu.org
@@ -192,7 +189,7 @@ Requires: libgccjit = %{version}-%{release}
 This package contains header files for building against libgccjit.
 
 %prep
-%setup -q -n gcc-%{TRUNCATED_GITREV} -a 1 -a 2
+%setup -q -n gcc-%{TRUNCATED_GITREV} -a 1
 %patch0 -p0 -b .hack~
 %patch1 -p0 -b .java-nomulti~
 %patch2 -p0 -b .ppc32-retaddr~
@@ -333,48 +330,6 @@ rm -fr obj-%{gcc_target_platform}
 mkdir obj-%{gcc_target_platform}
 cd obj-%{gcc_target_platform}
 
-%if %{build_cloog}
-mkdir isl-build isl-install
-%ifarch s390 s390x
-ISL_FLAG_PIC=-fPIC
-%else
-ISL_FLAG_PIC=-fpic
-%endif
-cd isl-build
-../../isl-%{isl_version}/configure --disable-shared \
-  CC=/usr/bin/gcc CXX=/usr/bin/g++ \
-  CFLAGS="${CFLAGS:-%optflags} $ISL_FLAG_PIC" --prefix=`cd ..; pwd`/isl-install
-make %{?_smp_mflags}
-make install
-cd ..
-
-mkdir cloog-build cloog-install
-cd cloog-build
-cat >> ../../cloog-%{cloog_version}/source/isl/constraints.c << \EOF
-#include <isl/flow.h>
-static void __attribute__((used)) *s1 = (void *) isl_union_map_compute_flow;
-static void __attribute__((used)) *s2 = (void *) isl_map_dump;
-EOF
-sed -i 's|libcloog|libgcc48privatecloog|g' \
-  ../../cloog-%{cloog_version}/{,test/}Makefile.{am,in}
-isl_prefix=`cd ../isl-install; pwd` \
-../../cloog-%{cloog_version}/configure --with-isl=system \
-  --with-isl-prefix=`cd ../isl-install; pwd` \
-  CC=/usr/bin/gcc CXX=/usr/bin/g++ \
-  CFLAGS="${CFLAGS:-%optflags}" CXXFLAGS="${CXXFLAGS:-%optflags}" \
-   --prefix=`cd ..; pwd`/cloog-install
-sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
-sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-make %{?_smp_mflags}
-make %{?_smp_mflags} install
-cd ../cloog-install/lib
-rm libgcc48privatecloog-isl.so{,.4}
-mv libgcc48privatecloog-isl.so.4.0.0 libcloog-isl.so.4
-ln -sf libcloog-isl.so.4 libcloog-isl.so
-ln -sf libcloog-isl.so.4 libcloog.so
-cd ../..
-%endif
-
 CC=gcc
 OPT_FLAGS=`echo %{optflags}|sed -e 's/\(-Wp,\)\?-D_FORTIFY_SOURCE=[12]//g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-m64//g;s/-m32//g;s/-m31//g'`
@@ -424,11 +379,7 @@ CC="$CC" CFLAGS="$OPT_FLAGS" \
         --enable-languages=jit \
 	--enable-plugin --enable-initfini-array \
 	--disable-libgcj \
-%if %{build_cloog}
-	--with-isl=`pwd`/isl-install --with-cloog=`pwd`/cloog-install \
-%else
 	--without-isl --without-cloog \
-%endif
 %ifarch %{arm}
 	--disable-sjlj-exceptions \
 %endif
@@ -482,15 +433,10 @@ CC="$CC" CFLAGS="$OPT_FLAGS" \
 	--build=%{gcc_target_platform}
 %endif
 
-%ifarch %{arm} sparc sparcv9 sparc64
-GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS" bootstrap
-%else
-GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS" profiledbootstrap
-%endif
-
-%if %{build_cloog}
-cp -a cloog-install/lib/libcloog-isl.so.4 gcc/
-%endif
+GCJFLAGS="$OPT_FLAGS" \
+  make \
+    %{?_smp_mflags} \
+    BOOT_CFLAGS="$OPT_FLAGS"
 
 # Make generated man pages even if Pod::Man is not new enough
 perl -pi -e 's/head3/head2/' ../contrib/texi2pod.pl
@@ -569,10 +515,6 @@ make prefix=%{buildroot}%{_prefix} mandir=%{buildroot}%{_mandir} \
 
 FULLPATH=%{buildroot}%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
 FULLEPATH=%{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}
-
-%if %{build_cloog}
-cp -a cloog-install/lib/libcloog-isl.so.4 $FULLPATH/
-%endif
 
 # fix some things
 ln -sf gcc %{buildroot}%{_prefix}/bin/cc
