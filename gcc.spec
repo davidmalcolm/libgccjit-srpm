@@ -1,4 +1,6 @@
 %global GITREV d995c94703ed92c542886b6d00a0037b007f2591
+%global TRUNCATED_GITREV d995c94
+
 %global multilib_64_archs sparc64 ppc64 s390x x86_64
 %ifarch %{ix86} x86_64 ia64
 %global build_libquadmath 1
@@ -149,14 +151,10 @@ Patch4: gcc48-i386-libgomp.patch
 Patch5: gcc48-sparc-config-detection.patch
 Patch6: gcc48-libgomp-omp_h-multilib.patch
 Patch7: gcc48-libtool-no-rpath.patch
-Patch8: gcc48-cloog-dl.patch
-Patch9: gcc48-cloog-dl2.patch
 Patch10: gcc48-pr38757.patch
 Patch11: gcc48-libstdc++-docs.patch
 Patch12: gcc48-no-add-needed.patch
-Patch13: gcc48-pr56564.patch
 Patch14: gcc48-pr56493.patch
-Patch15: gcc48-color-auto.patch
 
 Patch1000: fastjar-0.97-segfault.patch
 Patch1001: fastjar-0.97-len1.patch
@@ -194,7 +192,7 @@ Requires: libgccjit = %{version}-%{release}
 This package contains header files for building against libgccjit.
 
 %prep
-%setup -q -n gcc-%{version}-%{DATE} -a 1 -a 2
+%setup -q -n gcc-%{TRUNCATED_GITREV} -a 1 -a 2
 %patch0 -p0 -b .hack~
 %patch1 -p0 -b .java-nomulti~
 %patch2 -p0 -b .ppc32-retaddr~
@@ -203,20 +201,12 @@ This package contains header files for building against libgccjit.
 %patch5 -p0 -b .sparc-config-detection~
 %patch6 -p0 -b .libgomp-omp_h-multilib~
 %patch7 -p0 -b .libtool-no-rpath~
-%if %{build_cloog}
-%patch8 -p0 -b .cloog-dl~
-%patch9 -p0 -b .cloog-dl2~
-%endif
 %patch10 -p0 -b .pr38757~
 %if %{build_libstdcxx_docs}
 %patch11 -p0 -b .libstdc++-docs~
 %endif
 %patch12 -p0 -b .no-add-needed~
-%patch13 -p0 -b .pr56564~
 %patch14 -p0 -b .pr56493~
-%if 0%{?fedora} >= 20 || 0%{?rhel} >= 7
-%patch15 -p0 -b .color-auto~
-%endif
 
 %if 0%{?_enable_debug_packages}
 cat > split-debuginfo.sh <<\EOF
