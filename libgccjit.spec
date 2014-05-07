@@ -113,7 +113,6 @@ BuildRequires: gmp-devel
 BuildRequires: mpfr-devel
 BuildRequires: libmpc-devel
 
-Requires: cpp = %{version}-%{release}
 # Need .eh_frame ld optimizations
 # Need proper visibility support
 # Need -pie support
@@ -141,7 +140,6 @@ Requires: glibc >= 2.16
 %endif
 %endif
 Requires: libgcc >= %{version}-%{release}
-Requires: libgomp = %{version}-%{release}
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
 AutoReq: true
