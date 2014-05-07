@@ -1,5 +1,7 @@
-%global GITREV d995c94703ed92c542886b6d00a0037b007f2591
-%global TRUNCATED_GITREV d995c94
+#global GITREV d995c94703ed92c542886b6d00a0037b007f2591
+%global GITREV da875d96794a9dc267b144dc9e1897e7c7b6a254
+#global TRUNCATED_GITREV d995c94
+%global TRUNCATED_GITREV da875d96794a9dc267b144dc9e1897e7c7b6a254
 
 %global multilib_64_archs sparc64 ppc64 s390x x86_64
 %ifarch %{ix86} x86_64 ia64
@@ -49,7 +51,7 @@
 Summary: Shared library for embedding compilation into programs
 Name: libgccjit
 Version: 0.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv3+
 Group: Development/Languages
 # The source for this package was pulled from upstream's vcs.  Use the
@@ -520,14 +522,12 @@ tar cf - -T libjava-classes.list | bzip2 -9 > $RPM_SOURCE_DIR/libjava-classes-%{
 %install
 rm -fr %{buildroot}
 
-cd obj-%{gcc_target_platform}
+cd obj-%{gcc_target_platform}/gcc
 
-mkdir -p %{buildroot}/%{_libdir}
-mkdir -p %{buildroot}/%{_includedir}
-
-cp gcc/libgccjit.so %{buildroot}/%{_libdir}
-cp %{_builddir}/gcc-%{TRUNCATED_GITREV}/gcc/jit/libgccjit.h %{buildroot}/%{_includedir}
-cp %{_builddir}/gcc-%{TRUNCATED_GITREV}/gcc/jit/libgccjit++.h %{buildroot}/%{_includedir}
+make \
+  jit.install-common \
+  DESTDIR=%{buildroot} \
+  libdir=%{_libdir}
 
 %check
 cd obj-%{gcc_target_platform}
@@ -556,14 +556,18 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root,-)
-%{_libdir}/libgccjit.so
+%{_libdir}/libgccjit.so.*
 
 %files devel
 %defattr(-,root,root,-)
+%{_libdir}/libgccjit.so
 %{_includedir}/libgccjit.h
 %{_includedir}/libgccjit++.h
 
 %changelog
+* Wed May  7 2014 David Malcolm <dmalcolm@redhat.com> - 0.1-4
+- Add SONAME; use installation method from upstream
+
 * Wed May  7 2014 David Malcolm <dmalcolm@redhat.com> - 0.1-3
 - Tone down the binutils BR to something that's available on EL6
 - Drop libstdc++ docs and BRs
