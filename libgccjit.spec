@@ -108,6 +108,11 @@ BuildRequires: libunwind >= 0.98
 BuildRequires: doxygen >= 1.7.1
 BuildRequires: graphviz, dblatex, texlive-collection-latex, docbook5-style-xsl
 %endif
+
+BuildRequires: gmp-devel
+BuildRequires: mpfr-devel
+BuildRequires: libmpc-devel
+
 Requires: cpp = %{version}-%{release}
 # Need .eh_frame ld optimizations
 # Need proper visibility support
