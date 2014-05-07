@@ -28,7 +28,6 @@
 %global build_libitm 0
 %endif
 %global build_cloog 1
-%global build_libstdcxx_docs 1
 # If you don't have already a usable gcc-java and libgcj for your arch,
 # do on some arch which has it rpmbuild -bc --with java_tar gcc.spec
 # which creates libjava-classes-%{version}-%{release}.tar.bz2
@@ -50,7 +49,7 @@
 Summary: Shared library for embedding compilation into programs
 Name: libgccjit
 Version: 0.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv3+
 Group: Development/Languages
 # The source for this package was pulled from upstream's vcs.  Use the
@@ -77,8 +76,9 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # Need binutils which support --build-id >= 2.17.50.0.17-3
 # Need binutils which support %gnu_unique_object >= 2.19.51.0.14
 # Need binutils which support .cfi_sections >= 2.19.51.0.14-33
-# Need binutils which support --no-add-needed >= 2.20.51.0.2-12
-BuildRequires: binutils >= 2.20.51.0.2-12
+## Need binutils which support --no-add-needed >= 2.20.51.0.2-12
+#BuildRequires: binutils >= 2.20.51.0.2-12
+BuildRequires: binutils >= 2.19.51.0.14-33
 # While gcc doesn't include statically linked binaries, during testing
 # -static is used several times.
 BuildRequires: glibc-static
@@ -103,10 +103,6 @@ BuildRequires: /lib/libc.so.6 /usr/lib/libc.so /lib64/libc.so.6 /usr/lib64/libc.
 %endif
 %ifarch ia64
 BuildRequires: libunwind >= 0.98
-%endif
-%if %{build_libstdcxx_docs}
-BuildRequires: doxygen >= 1.7.1
-BuildRequires: graphviz, dblatex, texlive-collection-latex, docbook5-style-xsl
 %endif
 
 BuildRequires: gmp-devel
@@ -154,7 +150,6 @@ Patch5: gcc48-sparc-config-detection.patch
 Patch6: gcc48-libgomp-omp_h-multilib.patch
 Patch7: gcc48-libtool-no-rpath.patch
 Patch10: gcc48-pr38757.patch
-Patch11: gcc48-libstdc++-docs.patch
 Patch12: gcc48-no-add-needed.patch
 Patch14: gcc48-pr56493.patch
 
@@ -198,9 +193,6 @@ This package contains header files for building against libgccjit.
 %patch6 -p0 -b .libgomp-omp_h-multilib~
 %patch7 -p0 -b .libtool-no-rpath~
 %patch10 -p0 -b .pr38757~
-%if %{build_libstdcxx_docs}
-%patch11 -p0 -b .libstdc++-docs~
-%endif
 %patch12 -p0 -b .no-add-needed~
 %patch14 -p0 -b .pr56493~
 
@@ -572,6 +564,10 @@ rm -rf %{buildroot}
 %{_includedir}/libgccjit++.h
 
 %changelog
+* Wed May  7 2014 David Malcolm <dmalcolm@redhat.com> - 0.1-3
+- Tone down the binutils BR to something that's available on EL6
+- Drop libstdc++ docs and BRs
+
 * Wed May  7 2014 David Malcolm <dmalcolm@redhat.com> - 0.1-2
 - Add libgccjit++.h
 
