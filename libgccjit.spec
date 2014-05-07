@@ -336,24 +336,19 @@ cat >> ../../cloog-%{cloog_version}/source/isl/constraints.c << \EOF
 static void __attribute__((used)) *s1 = (void *) isl_union_map_compute_flow;
 static void __attribute__((used)) *s2 = (void *) isl_map_dump;
 EOF
-sed -i 's|libcloog|libgcc48privatecloog|g' \
-  ../../cloog-%{cloog_version}/{,test/}Makefile.{am,in}
 isl_prefix=`cd ../isl-install; pwd` \
 ../../cloog-%{cloog_version}/configure --with-isl=system \
   --with-isl-prefix=`cd ../isl-install; pwd` \
   CC=/usr/bin/gcc CXX=/usr/bin/g++ \
-  CFLAGS="${CFLAGS:-%optflags}" CXXFLAGS="${CXXFLAGS:-%optflags}" \
-   --prefix=`cd ..; pwd`/cloog-install
+  CFLAGS="${CFLAGS:-%optflags} $ISL_FLAG_PIC" \
+  CXXFLAGS="${CXXFLAGS:-%optflags} $ISL_FLAG_PIC" \
+   --prefix=`cd ..; pwd`/cloog-install \
+   --disable-shared
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 make %{?_smp_mflags}
 make %{?_smp_mflags} install
-cd ../cloog-install/lib
-rm libgcc48privatecloog-isl.so{,.4}
-mv libgcc48privatecloog-isl.so.4.0.0 libcloog-isl.so.4
-ln -sf libcloog-isl.so.4 libcloog-isl.so
-ln -sf libcloog-isl.so.4 libcloog.so
-cd ../..
+cd ..
 %endif
 
 CC=gcc
@@ -467,10 +462,6 @@ GCJFLAGS="$OPT_FLAGS" \
   make \
     %{?_smp_mflags} \
     BOOT_CFLAGS="$OPT_FLAGS"
-
-%if %{build_cloog}
-cp -a cloog-install/lib/libcloog-isl.so.4 gcc/
-%endif
 
 # Make generated man pages even if Pod::Man is not new enough
 perl -pi -e 's/head3/head2/' ../contrib/texi2pod.pl
