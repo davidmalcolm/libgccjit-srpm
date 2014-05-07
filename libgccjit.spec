@@ -50,7 +50,7 @@
 Summary: Shared library for embedding compilation into programs
 Name: libgccjit
 Version: 0.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv3+
 Group: Development/Languages
 # The source for this package was pulled from upstream's vcs.  Use the
@@ -535,6 +535,7 @@ mkdir -p %{buildroot}/%{_includedir}
 
 cp gcc/libgccjit.so %{buildroot}/%{_libdir}
 cp %{_builddir}/gcc-%{TRUNCATED_GITREV}/gcc/jit/libgccjit.h %{buildroot}/%{_includedir}
+cp %{_builddir}/gcc-%{TRUNCATED_GITREV}/gcc/jit/libgccjit++.h %{buildroot}/%{_includedir}
 
 %check
 cd obj-%{gcc_target_platform}
@@ -568,7 +569,11 @@ rm -rf %{buildroot}
 %files devel
 %defattr(-,root,root,-)
 %{_includedir}/libgccjit.h
+%{_includedir}/libgccjit++.h
 
 %changelog
+* Wed May  7 2014 David Malcolm <dmalcolm@redhat.com> - 0.1-2
+- Add libgccjit++.h
+
 * Tue May  6 2014 David Malcolm <dmalcolm@redhat.com> - 0.1-1
 - Initial packaging, based loosely on gcc-4.8.1-10.src.rpm
