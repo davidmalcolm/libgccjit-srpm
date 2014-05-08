@@ -2,6 +2,10 @@ SPECFILE := libgccjit.spec
 VERSION := $(shell rpm -q --qf "%{VERSION}\n" --specfile $(SPECFILE)| head -1)
 RELEASE := $(shell rpm -q --qf "%{RELEASE}\n" --specfile $(SPECFILE)| head -1)
 
+# Make a tarball from a local checkout
+tarball:
+	./make-tarball.sh
+
 srpm:
 	rpmbuild -bs $(SPECFILE) --define="_sourcedir $(shell pwd)"
 
