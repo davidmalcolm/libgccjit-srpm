@@ -1,7 +1,7 @@
-#global GITREV d995c94703ed92c542886b6d00a0037b007f2591
-%global GITREV da875d96794a9dc267b144dc9e1897e7c7b6a254
-#global TRUNCATED_GITREV d995c94
-%global TRUNCATED_GITREV da875d96794a9dc267b144dc9e1897e7c7b6a254
+%global GITREV 1920c315ff984892399893b380305ab36e07b455
+%global TRUNCATED_GITREV 1920c315ff984892399893b380305ab36e07b455
+
+%global alphatag .%{GITREV}
 
 %global multilib_64_archs sparc64 ppc64 s390x x86_64
 %ifarch %{ix86} x86_64 ia64
@@ -50,8 +50,8 @@
 %endif
 Summary: Shared library for embedding compilation into programs
 Name: libgccjit
-Version: 0.1
-Release: 4%{?dist}
+Version: 0.2
+Release: 0.5%{alphatag}%{?dist}
 License: GPLv3+
 Group: Development/Languages
 # The source for this package was pulled from upstream's vcs.  Use the
@@ -124,7 +124,9 @@ BuildRequires: libmpc-devel
 # Need binutils that support %gnu_unique_object
 # Need binutils that support .cfi_sections
 # Need binutils that support --no-add-needed
-Requires: binutils >= 2.20.51.0.2-12
+#Requires: binutils >= 2.20.51.0.2-12
+Requires: binutils >= 2.19.51.0.14-33
+
 # Make sure gdb will understand DW_FORM_strp
 Conflicts: gdb < 5.1-2
 Requires: glibc-devel >= 2.2.90-12
@@ -565,6 +567,15 @@ rm -rf %{buildroot}
 %{_includedir}/libgccjit++.h
 
 %changelog
+* Thu May  8 2014 David Malcolm <dmalcolm@redhat.com> - 0.2-0.5.1920c315ff984892399893b380305ab36e07b455
+- Update to 1920c315ff984892399893b380305ab36e07b455
+- Add leading period to alphatag to separate from GITREV.
+- Tone down the binutils runtime requirement to something available on EL6
+
+* Wed May  7 2014 David Malcolm <dmalcolm@redhat.com> - 0.2-0.4.da875d96794a9dc267b144dc9e1897e7c7b6a254
+- Use alphatag, rolling back to release 0 and arbitrarily bumping release
+to 0.2
+
 * Wed May  7 2014 David Malcolm <dmalcolm@redhat.com> - 0.1-4
 - Add SONAME; use installation method from upstream
 
