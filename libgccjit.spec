@@ -1,5 +1,5 @@
-%global GITREV 1920c315ff984892399893b380305ab36e07b455
-%global TRUNCATED_GITREV 1920c315ff984892399893b380305ab36e07b455
+%global GITREV 97dd1d5558a24425255428a84ca6505237085580
+%global TRUNCATED_GITREV 97dd1d5558a24425255428a84ca6505237085580
 
 %global alphatag .%{GITREV}
 
@@ -51,7 +51,7 @@
 Summary: Shared library for embedding compilation into programs
 Name: libgccjit
 Version: 0.2
-Release: 0.5%{alphatag}%{?dist}
+Release: 0.6%{alphatag}%{?dist}
 License: GPLv3+
 Group: Development/Languages
 # The source for this package was pulled from upstream's vcs.  Use the
@@ -567,6 +567,15 @@ rm -rf %{buildroot}
 %{_includedir}/libgccjit++.h
 
 %changelog
+* Tue Aug 12 2014 David Malcolm <dmalcolm@redhat.com> - 0.2-0.6.97dd1d5558a24425255428a84ca6505237085580
+- Update to 97dd1d5558a24425255428a84ca6505237085580:
+  - New entrypoints:
+    - gcc_jit_context_new_call_through_ptr
+    - gcc_jit_context_new_function_ptr_type
+    - gcc_jit_context_new_union_type
+  - Adds testcase for above, and for threads
+  - Fixes state issue in ipa-cp.c
+
 * Thu May  8 2014 David Malcolm <dmalcolm@redhat.com> - 0.2-0.5.1920c315ff984892399893b380305ab36e07b455
 - Update to 1920c315ff984892399893b380305ab36e07b455
 - Add leading period to alphatag to separate from GITREV.
